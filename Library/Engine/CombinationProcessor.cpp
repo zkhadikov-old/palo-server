@@ -33,7 +33,7 @@
 namespace palo {
 
 CombinationProcessorBase::CombinationProcessorBase(PEngineBase engine, CPPathTranslator pathTranslator, const vector<PPlanNode> &children) :
-	ProcessorBase(true, engine, engineLocked), index(-1), pathTranslator(pathTranslator), children(children)
+	ProcessorBase(true, engine, true), index(-1), pathTranslator(pathTranslator), children(children)
 {
 }
 

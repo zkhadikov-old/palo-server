@@ -58,8 +58,14 @@ protected:
 
 
 protected:
-	class base_iterator : public std::iterator<random_access_iterator_tag, Content, ptrdiff_t, Content *, Content &> {
+	class base_iterator {
 	public:
+		typedef random_access_iterator_tag iterator_category;
+		typedef Content value_type;
+		typedef ptrdiff_t difference_type;
+		typedef Content *pointer;
+		typedef Content &reference;
+
 		base_iterator(const base_iterator &iter);
 		virtual ~base_iterator() {}
 

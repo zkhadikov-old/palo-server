@@ -100,7 +100,7 @@ public:
 				if (element->getElementType() != elementType) {
 					dimension->changeElementType(server, database, element, elementType, user, false, &disabledRules, NULL, true);
 				}
-			} catch (ParameterException e) {
+			} catch (const ParameterException& e) {
 				// create element
 				element = dimension->addElement(server, database, NO_IDENTIFIER, name, elementType, user, true);
 				isCreated = true;

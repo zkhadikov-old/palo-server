@@ -77,6 +77,7 @@ public:
 	static int goalseekTimeoutMiliSec;
 	static int goalseekCellLimit;
 	static bool saveCSV;
+	static bool copyUseRulesDefault;
 
 	static const string PREFIX_ATTRIBUTE_CUBE;
 
@@ -150,6 +151,14 @@ public:
 	static void setGoalseekCellLimit(int cellCount);
 
 	static void setSaveCSV(bool save);
+
+	static void setCopyUseRulesDefault(bool useRules) {
+		copyUseRulesDefault = useRules;
+	}
+
+	static bool getCopyUseRulesDefault() {
+		return copyUseRulesDefault;
+	}
 
 public:
 

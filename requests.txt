@@ -1,0 +1,6 @@
+#2026-04-06 19:20:45
+#USER	START	REVISION	DURATION	REQUEST
+
+LAST FINISHED JOBS:
+admin	2026-04-06 16:44:57	6	0.000298	/server/login?user=admin&password=21...c3
+admin	2026-04-06 16:45:38	7	0.005856	/database/create?sid=F9t...62d&new_name=dwh

@@ -75,7 +75,14 @@ bffilebuf::bffilebuf(const FileName &filename, ios::openmode mode) :
 		setp((char *)writebuf, (char *)(writebuf + BUF_SIZE - 1));
 	}
 	memcpy(ivec, &initivec, 8);
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 	BF_set_key(&key, (int)passphrase.size(), (const unsigned char *)passphrase.c_str());
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 }
 
 bffilebuf::~bffilebuf()
@@ -120,7 +127,14 @@ int bffilebuf::__writetofile(size_t len)
 {
 	if (writebuf && out) {
 		unsigned char crypt[BUF_SIZE];
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 		BF_cfb64_encrypt(writebuf, crypt, (long)len, &key, ivec, &num, BF_ENCRYPT);
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 		out->write((const char *)crypt, len);
 		if (!out->bad() && !out->fail()) {
 			setp((char *)writebuf, (char *)(writebuf + BUF_SIZE - 1));
@@ -153,7 +167,14 @@ int bffilebuf::underflow()
 		in->read((char *)crypt, BUF_SIZE - 1);
 		streamsize read = in->gcount();
 		if (read) {
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 			BF_cfb64_encrypt(crypt, readbuf, (long)read, &key, ivec, &num, BF_DECRYPT);
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 			remaining -= read;
 			setg((char *)readbuf, (char *)readbuf, (char *)(readbuf + read));
 			return readbuf[0];

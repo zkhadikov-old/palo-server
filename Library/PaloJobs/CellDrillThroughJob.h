@@ -135,7 +135,7 @@ private:
 					throw ErrorException(ErrorException::ERROR_INTERNAL, result[0]);
 				}
 			}
-		} catch (ErrorException e) {
+		} catch (const ErrorException& e) {
 			response = new HttpResponse(HttpResponse::BAD);
 
 			StringBuffer& body = response->getBody();

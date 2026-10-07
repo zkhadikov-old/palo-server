@@ -1,0 +1,18 @@
+---
+description: Inclure paloexport dans tout paquet Debian / build packaging
+alwaysApply: false
+---
+
+# Paquet Debian (.deb) — utilitaire paloexport
+
+Lorsque vous modifiez le packaging ou que vous construisez un `.deb` à partir de ce dépôt :
+
+- **Toujours inclure le binaire `paloexport`** dans le paquet, sous **`/usr/bin/paloexport`**, à côté de `palo`.
+- Le script `packaging/build-deb.sh` doit :
+  - passer **`-DENABLE_PALOEXPORT=ON`** à CMake ;
+  - construire la cible **`paloexport`** (CMake `ENABLE_PALOEXPORT` activé par défaut) ;
+  - copier **`build/usr/bin/paloexport`** vers l’arborescence de staging si le fichier existe.
+- Mentionner brièvement **`paloexport`** dans la **Description** de `packaging/debian/control` si ce n’est pas déjà fait.
+- Lors d’un nouveau build `.deb` qui change le paquet, **incrémenter la révision Debian** (`Version` dans `packaging/debian/control` et `VERSION` dans `packaging/build-deb.sh`).
+
+En résumé : un paquet produit par ce repo doit exposer **`palo` et `paloexport`** dans `/usr/bin` dès que le build fournit `paloexport`.

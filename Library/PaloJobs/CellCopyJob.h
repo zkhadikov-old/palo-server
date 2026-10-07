@@ -82,6 +82,7 @@ public:
 		bool ret = false;
 		for (int commitTry = 0; commitTry < Commitable::COMMIT_REPEATS_CELL_REPLACE; commitTry++) {
 			Context *context = Context::getContext();
+			const bool useRules = jobRequest->useRules || Cube::getCopyUseRulesDefault();
 
 			bool optimistic = commitTry == 0;
 			server = context->getServerCopy();
@@ -109,7 +110,7 @@ public:
 				IdentifierType timeDim = checkArea();
 				PCubeArea calcArea(new CubeArea(database, cube, *jobRequest->area));
 				cube->checkAreaAccessRight(database, user, calcArea, rs, false, RIGHT_READ, 0);
-				dValue = calculatePredictFunction(calcArea, timeDim);
+				dValue = calculatePredictFunction(calcArea, timeDim, useRules);
 			} else {
 				cube->checkAreaAccessRight(database, user, cellPath, rs, false, RIGHT_READ, 0);
 				if (jobRequest->value) {
@@ -124,7 +125,7 @@ public:
 			}
 
 			bool unused = false; //NULL is also an unused value
-			PCellValueContext cvc = PCellValueContext(new CellValueContext(cube, CellValueContext::CELL_COPY_JOB, database, user, boost::shared_ptr<PaloSession>(), unused, unused, (int)unused, lockedPaths, cellPathTo, jobRequest->useRules, ptrValue));
+			PCellValueContext cvc = PCellValueContext(new CellValueContext(cube, CellValueContext::CELL_COPY_JOB, database, user, boost::shared_ptr<PaloSession>(), unused, unused, (int)unused, lockedPaths, cellPathTo, useRules, ptrValue));
 			context->setCellValueContext(cvc);
 			cvc->addPathAndValue(cellPath, CellValue(), unused, CubeArea::NONE);
 
@@ -200,7 +201,7 @@ private:
 		return timeDim;
 	}
 
-	double calculatePredictFunction(PCubeArea calcArea, IdentifierType timeDim)
+	double calculatePredictFunction(PCubeArea calcArea, IdentifierType timeDim, bool useRules)
 	{
 		double result = 0.0;
 		if (calcArea->getSize()) {
@@ -216,7 +217,7 @@ private:
 			size_t i = 0;
 			eit = calcArea->elemBegin(timeDim);
 
-			PCellStream cs = cube->calculateArea(calcArea, CubeArea::NUMERIC, jobRequest->useRules ? RulesType(ALL_RULES | NO_RULE_IDS) : NO_RULES, false, UNLIMITED_SORTED_PLAN);
+			PCellStream cs = cube->calculateArea(calcArea, CubeArea::NUMERIC, useRules ? RulesType(ALL_RULES | NO_RULE_IDS) : NO_RULES, false, UNLIMITED_SORTED_PLAN);
 			while (cs->next()) {
 				elem = dim->findElement(*eit, 0, false);
 				X[i] = (double)elem->getPosition();

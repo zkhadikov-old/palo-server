@@ -171,7 +171,7 @@ public:
 				if (!message.empty()) {
 					message = createHtmlMessage("Info", message);
 				}
-			} catch (ErrorException e) {
+			} catch (const ErrorException& e) {
 				message = createHtmlMessage("Error", e.getMessage());
 			}
 		}

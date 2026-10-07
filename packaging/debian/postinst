@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure|upgrade)
+        # create palo user and group if they do not exist
+        if ! id palo >/dev/null 2>&1; then
+            adduser --system --group --home /var/lib/palo --no-create-home palo || true
+        fi
+
+        # ensure data and log directories exist with proper ownership
+        mkdir -p /var/lib/palo
+        mkdir -p /var/log/palo
+        chown -R palo:palo /var/lib/palo
+        chown -R palo:palo /var/log/palo
+
+        # reload systemd units and enable/start service
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload || true
+            systemctl enable palo.service || true
+            systemctl restart palo.service || true
+        fi
+    ;;
+esac
+
+exit 0
+

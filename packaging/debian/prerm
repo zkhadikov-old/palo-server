@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|upgrade)
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl stop palo.service || true
+            systemctl disable palo.service || true
+        fi
+    ;;
+esac
+
+exit 0
+

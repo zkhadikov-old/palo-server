@@ -242,8 +242,11 @@ void CommitableList::erase(Iterator it)
 }
 
 template<typename TKey, typename TValue>
-struct ExtractPairFirst : public unary_function<pair<TKey, TValue> , const TKey> {
-	typename unary_function<pair<TKey, TValue> , const TKey>::result_type operator()(const typename unary_function<pair<TKey, TValue> , const TKey>::argument_type &arg) const {
+struct ExtractPairFirst {
+	typedef pair<TKey, TValue> argument_type;
+	typedef TKey result_type;
+
+	result_type operator()(const argument_type &arg) const {
 		return arg.first;
 	}
 };

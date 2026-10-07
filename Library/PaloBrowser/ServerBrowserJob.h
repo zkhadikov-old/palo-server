@@ -165,7 +165,7 @@ public:
 				if (message != "") {
 					message = createHtmlMessage("Info", message);
 				}
-			} catch (ErrorException e) {
+			} catch (const ErrorException& e) {
 				message = createHtmlMessage("Error", e.getMessage());
 			}
 		}

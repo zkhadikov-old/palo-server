@@ -74,9 +74,9 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 
 	void compute() {
+		server = Context::getContext()->getServer();
 		checkToken(server);
 
-		server = Context::getContext()->getServer();
 		vector<CPDatabase> databases;
 
 		if (jobRequest->mode == 1) {

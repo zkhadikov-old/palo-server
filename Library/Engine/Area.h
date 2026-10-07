@@ -106,8 +106,14 @@ class Set : public boost::enable_shared_from_this<Set> {
 public:
 	typedef set<pair<IdentifierType, IdentifierType> > SetType;
 
-	class Iterator  : public std::iterator<forward_iterator_tag, IdentifierType, ptrdiff_t, IdentifierType *, IdentifierType &> {
+	class Iterator  {
 	public:
+		typedef forward_iterator_tag iterator_category;
+		typedef IdentifierType value_type;
+		typedef ptrdiff_t difference_type;
+		typedef IdentifierType *pointer;
+		typedef IdentifierType &reference;
+
 		Iterator(const Iterator &it);
 		Iterator();
 		Iterator(const SetType::iterator &it, const Set &s, bool end);

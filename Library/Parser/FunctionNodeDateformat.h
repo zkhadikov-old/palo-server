@@ -239,7 +239,7 @@ public:
 			} else {
 				result = "";
 			}
-		} catch (ParameterException e) {
+		} catch (const ParameterException& e) {
 			result = "";
 		}
 

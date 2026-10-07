@@ -1,0 +1,17 @@
+[Unit]
+Description=Palo MOLAP Server
+After=network.target
+
+[Service]
+Type=simple
+User=palo
+Group=palo
+ExecStart=/usr/bin/palo -h 0.0.0.0 7777 -d /var/lib/palo -i /etc/palo/palo.ini -o /var/log/palo/palo.log
+Restart=on-failure
+RestartSec=5
+RuntimeDirectory=palo
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+

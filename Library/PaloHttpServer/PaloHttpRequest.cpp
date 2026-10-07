@@ -134,6 +134,8 @@ void PaloHttpRequest::extractHeader(char* begin, char* end)
 							type = HTTP_REQUEST_POST;
 						} else if (start + 3 == colon && strncmp(start, "GET", 3) == 0) {
 							type = HTTP_REQUEST_GET;
+						} else if (start + 7 == colon && strncmp(start, "OPTIONS", 7) == 0) {
+							type = HTTP_REQUEST_OPTIONS;
 						}
 
 						if (type != HTTP_REQUEST_ILLEGAL) {
@@ -608,11 +610,11 @@ void PaloHttpRequest::setKeyValue(char * keyStart, char * keyPtr, char * valueSt
 			break;
 
 		case PaloRequestHandler::CMD_NAME_PATH:
-			fillVectorString(paloJobRequest->pathName, valueStart, valuePtr, ',');
+			fillVectorStringQuote(paloJobRequest->pathName, valueStart, valuePtr, ',');
 			break;
 
 		case PaloRequestHandler::CMD_NAME_PATH_TO:
-			fillVectorString(paloJobRequest->pathToName, valueStart, valuePtr, ',');
+			fillVectorStringQuote(paloJobRequest->pathToName, valueStart, valuePtr, ',');
 			break;
 
 		case PaloRequestHandler::CMD_VALUES:
@@ -640,7 +642,7 @@ void PaloHttpRequest::setKeyValue(char * keyStart, char * keyPtr, char * valueSt
 			break;
 
 		case PaloRequestHandler::CMD_NAME_PATHS:
-			fillVectorVectorString(paloJobRequest->pathsName, valueStart, valuePtr, ':', ',');
+			fillVectorVectorStringQuote(paloJobRequest->pathsName, valueStart, valuePtr, ':', ',');
 			break;
 		case PaloRequestHandler::CMD_FUNCTION:
 			fillUint(paloJobRequest->function, valueStart, valuePtr);

@@ -645,10 +645,10 @@ vector<PCube> Database::processJournalCommand(PServer server, JournalFileReader 
 			createdCubes.push_back(cube);
 
 			PCube newCube;
-			if (newCube = lookupCube(idNewCellRightCube, false)) {
+			if ((newCube = lookupCube(idNewCellRightCube, false))) {
 				createdCubes.push_back(newCube);
 			}
-			if (newCube = lookupCube(idNewCellPropsCube, false)) {
+			if ((newCube = lookupCube(idNewCellPropsCube, false))) {
 				createdCubes.push_back(newCube);
 			}
 
@@ -677,10 +677,10 @@ vector<PCube> Database::processJournalCommand(PServer server, JournalFileReader 
 		addDimension(server, dim, true, false, &attributesDim, &attributesCube, &rightsCube, &dimDimElem, false);
 
 		PCube newCube;
-		if (newCube = lookupCube(attributesCube, false)) {
+		if ((newCube = lookupCube(attributesCube, false))) {
 			createdCubes.push_back(newCube);
 		}
-		if (newCube = lookupCube(rightsCube, false)) {
+		if ((newCube = lookupCube(rightsCube, false))) {
 			createdCubes.push_back(newCube);
 		}
 

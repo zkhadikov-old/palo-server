@@ -29,16 +29,23 @@
 # change palo version and revision here when needed
 set(PALO_MAJOR 5)
 set(PALO_MINOR 1)
-set(REVISION "9999")
+set(REVISION "10000")
 
 # print config message
 message(STATUS "================== Configuring PALO Server Version 5.1.x ==================")
 
 # minimum required cmake version
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10)
 
 # set project name
 project("palo" CXX C)
+
+# Build with C++17 explicitly.
+# ICU on modern Debian relies on C++17 types (e.g. std::string_view), so
+# building with older standards fails.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 # set path for extra cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Modules/CMake")
@@ -104,6 +111,13 @@ check_cxx_compiler_flag(-Wall WallCXX)
 if(WallC AND WallCXX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
+
+# Generated lexer/gperf sources still use legacy `register` and trigger
+# noisy warnings with C++17; keep warnings useful by suppressing that one.
+check_cxx_compiler_flag(-Wno-register NoRegisterCXX)
+if(NoRegisterCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
 endif()
 
 # check if C compiler doesn't accept -c and -o together
@@ -187,6 +201,10 @@ message(STATUS "library output directory is: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 ### check BOOST
 ################################################################################
 
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif()
+
 find_package( Boost 1.43 REQUIRED COMPONENTS thread system)
 if(Boost_FOUND)
     set(Boost_USE_MULTITHREADED ON)
@@ -199,16 +217,17 @@ else(Boost_FOUND)
 endif(Boost_FOUND)
 
 ################################################################################
-### check openSSL
+### check openSSL (OpenSSL 3.x — target: Debian 13+ and similar)
 ################################################################################
 
-find_package(OpenSSL REQUIRED)
+find_package(OpenSSL 3.0 REQUIRED)
 if(OPENSSL_FOUND)
     check_include_file_cxx(openssl/ssl.h HAVE_OPENSSL_SSL_H)
     check_library_exists(ssl SSL_get_error "" HAVE_SSL_LIB)
     set(INCLUDES ${INCLUDES} ${OpenSSL_INCLUDE_DIRS})
     set(OPENSSL_LIBS ssl crypto)
-    set(LIBS ${LIBS} crypto)
+    # libssl: TLS client (NetInitialisation, HttpsClientConnection); libcrypto: digests etc.
+    set(LIBS ${LIBS} ssl crypto)
 else(OPENSSL_FOUND)
     message(FATAL_ERROR "OpenSSL not available, install it!")
 endif(OPENSSL_FOUND)
@@ -246,7 +265,7 @@ endif(ICU_FOUND)
 ### check for zlib
 ################################################################################
 
-find_package(ZLIB REQUIRED COMPONENTS z)
+find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)
     set(INCLUDES ${INCLUDES} ${ZLIB_INCLUDE_DIRS})
     set(LIBS ${LIBS} z)
@@ -690,7 +709,10 @@ CollectFilesForLib("${libpalo_DIR_LIST}" LIBPALO_FILES)
 set(FILE_LIST_TO_EXCLUDE "")
 # need only for windows build in polo.exe
 file(GLOB_RECURSE EXCLUDE_FILES Programs/palorun.cpp)
-set(FILE_LIST_TO_EXCLUDE ${FILE_LIST_TO_EXCLUDE} ${EXCLUDE_FILES})
+# paloexport / paloimport are separate executables, not part of palo
+file(GLOB PALOEXPORT_LIBEXCLUDE Programs/paloexport/*.cpp)
+file(GLOB PALOIMPORT_LIBEXCLUDE Programs/paloimport/*.cpp)
+set(FILE_LIST_TO_EXCLUDE ${FILE_LIST_TO_EXCLUDE} ${EXCLUDE_FILES} ${PALOEXPORT_LIBEXCLUDE} ${PALOIMPORT_LIBEXCLUDE})
 list(REMOVE_ITEM LIBPALO_FILES ${FILE_LIST_TO_EXCLUDE})
 
 # https interface
@@ -728,7 +750,7 @@ endif(ENABLE_HTTPS STREQUAL Module)
 
 add_custom_target(clean.${PACKAGE} COMMAND rm -f ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PACKAGE} VERBATIM)
 add_executable(${PACKAGE} ${LIBPALO_FILES})
-target_link_libraries(${PACKAGE} ${LIBS})
+target_link_libraries(${PACKAGE} ${LIBS} stdc++)
 
 if(PROJECT_BUILD_TYPE STREQUAL RelWithDebInfo)
     add_dependencies(${PACKAGE} clean.${PACKAGE})
@@ -738,6 +760,54 @@ if(PROJECT_BUILD_TYPE STREQUAL RelWithDebInfo)
                                             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} VERBATIM)
     add_dependencies(debug.${PACKAGE} ${PACKAGE})
 endif(PROJECT_BUILD_TYPE STREQUAL RelWithDebInfo)
+
+################################################################################
+### paloexport — export JSON structure d'un cube (client HTTP(S) sockets + OpenSSL)
+################################################################################
+
+option(ENABLE_PALOEXPORT "Build paloexport export utility" ON)
+if(ENABLE_PALOEXPORT)
+    add_executable(paloexport
+        Programs/paloexport/paloexport_main.cpp
+        Programs/paloexport/paloexport_client.cpp
+    )
+    target_include_directories(paloexport PRIVATE ${CMAKE_SOURCE_DIR}/Programs/paloexport)
+    target_link_libraries(paloexport PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+    set_target_properties(paloexport PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    message(STATUS "paloexport: enabled")
+endif()
+
+################################################################################
+### paloimport — import JSON structure (nlohmann_json ; client HTTP paloexport à l’étape --execute)
+################################################################################
+
+option(ENABLE_PALOIMPORT "Build paloimport import utility" ON)
+if(ENABLE_PALOIMPORT)
+    find_package(nlohmann_json 3.7.0 QUIET CONFIG)
+    if(NOT nlohmann_json_FOUND)
+        include(FetchContent)
+        FetchContent_Declare(
+            nlohmann_json
+            GIT_REPOSITORY https://github.com/nlohmann/json.git
+            GIT_TAG v3.11.3
+            GIT_SHALLOW TRUE
+        )
+        set(JSON_BuildTests OFF CACHE INTERNAL "")
+        set(JSON_Install OFF CACHE INTERNAL "")
+        FetchContent_MakeAvailable(nlohmann_json)
+    endif()
+    add_executable(paloimport
+        Programs/paloimport/paloimport_main.cpp
+        Programs/paloexport/paloexport_client.cpp
+    )
+    target_include_directories(paloimport PRIVATE
+        ${CMAKE_SOURCE_DIR}/Programs/paloimport
+        ${CMAKE_SOURCE_DIR}/Programs/paloexport
+    )
+    target_link_libraries(paloimport PRIVATE nlohmann_json::nlohmann_json OpenSSL::SSL OpenSSL::Crypto)
+    set_target_properties(paloimport PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    message(STATUS "paloimport: enabled")
+endif()
 
 ################################################################################
 ### enable doxygen to create documentation

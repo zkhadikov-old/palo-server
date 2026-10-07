@@ -54,7 +54,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 
 	enum HttpRequestType {
-		HTTP_REQUEST_GET, HTTP_REQUEST_POST, HTTP_REQUEST_ILLEGAL
+		HTTP_REQUEST_GET, HTTP_REQUEST_POST, HTTP_REQUEST_OPTIONS, HTTP_REQUEST_ILLEGAL
 	};
 
 public:

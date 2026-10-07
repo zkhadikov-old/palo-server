@@ -119,6 +119,8 @@ void HttpRequest::extractHeader(char* begin, char* end)
 							type = HTTP_REQUEST_POST;
 						} else if (key == "GET") {
 							type = HTTP_REQUEST_GET;
+						} else if (key == "OPTIONS") {
+							type = HTTP_REQUEST_OPTIONS;
 						}
 
 						if (type != HTTP_REQUEST_ILLEGAL) {

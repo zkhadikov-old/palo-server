@@ -161,8 +161,14 @@ public:
 	TargetReader getTargets(IdentifierType sourceId) const;
 	bool operator==(const AggregationMap &o) const;
 
-	class Iterator  : public std::iterator<forward_iterator_tag, IdentifierType, ptrdiff_t, IdentifierType *, IdentifierType &> {
+	class Iterator  {
 	public:
+		typedef forward_iterator_tag iterator_category;
+		typedef IdentifierType value_type;
+		typedef ptrdiff_t difference_type;
+		typedef IdentifierType *pointer;
+		typedef IdentifierType &reference;
+
 		Iterator(const Iterator &it);
 		Iterator();
 		Iterator(const AggregationMap &am, bool end=false);

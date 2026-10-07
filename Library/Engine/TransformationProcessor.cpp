@@ -169,7 +169,7 @@ private:
 	ProcessorBase *cachedInput;
 };
 
-static ostream& operator<<(ostream& ostr, const IdentifiersType& v)
+[[maybe_unused]] static ostream& operator<<(ostream& ostr, const IdentifiersType& v)
 {
 	bool first = true;
 	ostr << dec;

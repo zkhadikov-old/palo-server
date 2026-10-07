@@ -102,7 +102,7 @@ public:
 			if (value.type == Node::NODE_STRING) {
 				try {
 					result.doubleValue = UTF8Comparer::stringToDouble(value.stringValue, false);
-				} catch (ParameterException e) {
+				} catch (const ParameterException& e) {
 					result.doubleValue = 0.0;
 				}
 				return result;

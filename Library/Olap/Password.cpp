@@ -86,7 +86,14 @@ Password &Password::increaseLevel(int level)
 	// only possible level conversion in v 4.0 lvl_0->lvl_1 = plain -> MD5
 	if (level > getLevel()) {
 		unsigned char omd5buf[MD5_DIGEST_LENGTH];
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 		MD5((const unsigned char *)password.c_str(), password.size(), omd5buf);
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 		hashLevel++;
 		password = "\t"+StringUtils::convertToString(hashLevel)+"\t"+bin2Hex((const unsigned char *)omd5buf, sizeof(omd5buf));
 	}

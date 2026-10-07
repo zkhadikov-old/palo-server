@@ -44,7 +44,11 @@ namespace palo {
 class SERVER_CLASS Condition {
 public:
 	template<class _Tp>
-	struct logical_xor : public binary_function<_Tp, _Tp, bool> {
+	struct logical_xor {
+		typedef _Tp first_argument_type;
+		typedef _Tp second_argument_type;
+		typedef bool result_type;
+
 		bool operator()(const _Tp& x, const _Tp& y) const {
 			return (x || y) && !(x && y);
 		}

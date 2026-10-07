@@ -265,6 +265,12 @@ void PaloJob::generateDatabaseResponse(CPDatabase database)
 	StringBuffer& body = response->getBody();
 
 	setToken(database);
+	/* Après création / restauration de base, le jeton serveur change : les clients qui envoient
+	 * X-PALO-SV doivent recevoir la valeur à jour (sinon le prochain /server/databases échoue en 400). */
+	CPServer srv = Context::getContext()->getServer();
+	if (srv) {
+		setToken(srv);
+	}
 
 	appendDatabase(&body, database);
 }

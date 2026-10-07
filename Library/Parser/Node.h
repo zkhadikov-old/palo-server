@@ -78,8 +78,8 @@ public:
 	};
 
 	struct RuleValueType {
-		ValueType type;
-		double doubleValue;
+		ValueType type = NODE_UNKNOWN_VALUE;
+		double doubleValue = 0.0;
 		string stringValue;
 	};
 

@@ -81,6 +81,7 @@ static const char * AllowedOptions[] = {"?|help",
         "l:maximum-return-cells  <maximum_return_cells>",
         "L+splash-limit          <error> <warning> <info>",
         "M:session-timeout       <seconds>",
+        "N|copy-use-rules-default",
         "m:undo-memory-size      <undo_memory_size_in_bytes_per_lock>",
         "n|load-init-file",
         "o:log                   <logfile>",
@@ -183,6 +184,7 @@ PaloOptions::PaloOptions(int argc, char** argv) :
 
 	crypt = false;
 	saveCSV = true;
+	copyUseRulesDefault = false;
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -300,6 +302,7 @@ void PaloOptions::updateGlobals()
 	Cube::setGoalseekTimeout(goalseekTimeout);
 	Cube::setIgnoreCellData(ignoreCellData);
 	Cube::setSaveCSV(saveCSV);
+	Cube::setCopyUseRulesDefault(copyUseRulesDefault);
 	if (defaultDbRight.length()) {
 		Server::setDefaultDbRight(defaultDbRight);
 	}
@@ -564,6 +567,10 @@ void PaloOptions::parseOptions(OptionsIterator& iter, bool commandLine)
 			case 'M':
 				i = StringUtils::stringToInteger(optarg);
 				defaultTtl = i;
+				break;
+
+			case 'N':
+				copyUseRulesDefault = !copyUseRulesDefault;
 				break;
 
 			case 'n':

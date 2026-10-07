@@ -130,7 +130,7 @@ public:
 						time_t dtm = mktime(&t);
 						result.doubleValue = (double)(dtm / 86400 * 86400);
 					}
-				} catch (ParameterException e) {
+				} catch (const ParameterException& e) {
 					result.doubleValue = 0.0;
 				}
 

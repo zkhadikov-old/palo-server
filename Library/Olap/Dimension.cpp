@@ -1910,7 +1910,7 @@ void Dimension::removeChildren(PServer server, PDatabase db, PUser user, Element
 	}
 }
 
-template<class T> class notInSet : public unary_function<bool, T> {
+template<class T> class notInSet {
 public:
 	notInSet(set<T> * keep) :
 		keep(keep) {

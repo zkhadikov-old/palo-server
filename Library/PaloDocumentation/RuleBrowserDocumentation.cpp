@@ -116,7 +116,7 @@ RuleBrowserDocumentation::RuleBrowserDocumentation(PDatabase database, PCube cub
 				}
 
 				// find intersection of rules with this area
-				PPlanNode plan = cube->createPlan(cubeArea, CubeArea::ALL, RulesType(DIRECT_RULES || NOCACHE), true, UNLIMITED_SORTED_PLAN);
+				PPlanNode plan = cube->createPlan(cubeArea, CubeArea::ALL, RulesType(DIRECT_RULES | NOCACHE), true, UNLIMITED_SORTED_PLAN);
 				analyze(plan);
 			}
 		}

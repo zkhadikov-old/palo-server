@@ -54,3 +54,60 @@ HOWTO start palo
       be stored
     * see palo --help for more options        
 
+
+D) Build on Debian 13 (Linux)
+
+The following steps have been tested on Debian 13 with recent CMake (>= 3.10)
+and gcc/g++:
+
+  1. Install required packages (as root or via sudo):
+
+       apt-get update
+       apt-get install -y \
+         build-essential cmake pkg-config \
+         libboost-dev libboost-system-dev libboost-thread-dev libboost-regex-dev \
+         libssl-dev libicu-dev zlib1g-dev \
+         google-perftools libgoogle-perftools-dev \
+         bison flex gperf doxygen
+
+     - Boost, OpenSSL, ICU, ZLIB and Google Performance Tools are mandatory
+       for a successful build.
+     - bison, flex, gperf and doxygen are optional and only needed if you want
+       to regenerate parsers/commands or build the C++ API documentation.
+
+  2. Configure the build (from the project root):
+
+       mkdir -p build
+       cd build
+       cmake -G "Unix Makefiles" \
+         -DPROJECT_BUILD_TYPE=Release \
+         ..
+
+     Useful options (pass as -DNAME=VALUE to cmake):
+       - PROJECT_BUILD_TYPE={Release|Debug|RelWithDebInfo}
+       - ENABLE_HTTPS={Module|Builtin|OFF}
+       - ENABLE_TRACE_OPTION={ON|OFF}
+       - ENABLE_PROFILE={ON|OFF}
+       - ENABLE_TIME_PROFILER={ON|OFF}
+       - ENABLE_USE_BISON={ON|OFF}
+       - ENABLE_USE_FLEX={ON|OFF}
+       - ENABLE_USE_GPERF={ON|OFF}
+       - ENABLE_32BIT={ON|OFF} (may fail if 32‑bit toolchain is unavailable)
+
+  3. Build:
+
+       cd build
+       make -j"$(nproc)"
+
+     The main executable will be created as:
+
+       build/usr/bin/palo
+
+  4. Run (example):
+
+       cd build/usr/bin
+       ./palo -h 127.0.0.1 7777 -d /path/to/data_directory
+
+     Replace "/path/to/data_directory" with a directory where you want your
+     data to be stored. Use "palo --help" for further options.
+        

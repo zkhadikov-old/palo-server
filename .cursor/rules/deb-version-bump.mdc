@@ -1,0 +1,19 @@
+---
+description: Always bump Debian package version before building .deb
+alwaysApply: true
+---
+
+# Debian Package Version Bump
+
+When creating or rebuilding a `.deb` package in this repository:
+
+- Increment the Debian revision every time (e.g. `5.1.4-4` -> `5.1.4-5`).
+- Keep `packaging/debian/control` and `packaging/build-deb.sh` versions in sync.
+- Never reuse the same package version for a new build that contains changes.
+- Before finalizing, verify the built package metadata with:
+  - `dpkg-deb -I <path-to-deb>`
+
+Example:
+
+- `packaging/debian/control`: `Version: 5.1.4-5`
+- `packaging/build-deb.sh`: `VERSION="5.1.4-5"`

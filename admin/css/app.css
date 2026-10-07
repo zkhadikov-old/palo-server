@@ -1,0 +1,185 @@
+/* Compléments au-dessus de Bootstrap — colonnes type Finder */
+
+.column {
+  flex: 0 0 min(280px, 42vw);
+  min-width: 200px;
+  max-width: 360px;
+  min-height: 0;
+}
+
+.column--wide {
+  flex: 0 0 min(440px, 55vw);
+  max-width: 560px;
+}
+
+/* Panneau arbre d’éléments (plus étroit) */
+.column--tree {
+  flex: 0 0 min(300px, 40vw);
+  max-width: 400px;
+}
+
+.consolidate-pick-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.column-header {
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  border-bottom: 1px solid var(--bs-border-color);
+  background-color: var(--bs-tertiary-bg);
+}
+
+.column-body {
+  min-height: 0;
+}
+
+.column-footer {
+  flex-shrink: 0;
+}
+
+/* Barre titre + bouton « + » au-dessus d’une liste */
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  background-color: var(--bs-tertiary-bg);
+  flex-shrink: 0;
+}
+
+.list-toolbar-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0 !important;
+  line-height: 1;
+  font-size: 1.25rem;
+  font-weight: 300;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bouton « − » suppression sur une ligne de liste */
+.list-row-delete {
+  width: 1.75rem;
+  height: 1.75rem;
+  min-width: 1.75rem;
+  padding: 0 !important;
+  line-height: 1;
+  font-size: 1.15rem;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-row-main {
+  min-width: 0;
+}
+
+/* Liste dimensions dans le panneau cube : information uniquement */
+.cube-dim-info-list .list-group-item {
+  cursor: default;
+  background-color: var(--bs-tertiary-bg);
+}
+
+/* Modale nouveau cube : liste des dimensions */
+.cube-dim-picker {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.cube-dim-picker .cube-dim-pick-item.active {
+  background-color: var(--bs-primary-bg-subtle);
+  border-color: var(--bs-primary-border-subtle);
+  color: var(--bs-emphasis-color);
+}
+
+/* Arbre d’éléments : même principe que les list-group (dimensions / cubes) */
+.element-tree-list,
+.element-tree-nested {
+  list-style: none;
+}
+
+.element-tree-nested {
+  border-left: 1px solid var(--bs-border-color) !important;
+}
+
+.element-tree-list .name {
+  font-weight: 500;
+}
+
+.element-tree-list .meta {
+  margin-left: 0.15rem;
+}
+
+/* Icônes dimension / cube dans les listes (Bootstrap list-group) */
+.list-item-icon-dim::before {
+  content: "▢ ";
+  opacity: 0.65;
+}
+
+.list-item-icon-cube::before {
+  content: "◼ ";
+  opacity: 0.65;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Listes cliquables : curseur main (pas I‑texte), pas de « sélection » de ligne */
+/* -------------------------------------------------------------------------- */
+
+#app .list-group .list-group-item,
+#modalUsers .list-group .list-group-item,
+.modal .cube-dim-picker .cube-dim-pick-item {
+  cursor: pointer;
+  user-select: none;
+}
+
+#app .cube-dim-info-list .list-group-item {
+  cursor: default;
+  user-select: text;
+}
+
+#app .list-group-item .list-row-main,
+#app .list-group-item .list-group-item-action {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Ligne sélectionnée : fond bleu primaire (évite fond blanc / contrastes bizarres) */
+#app .list-group-item.active,
+#modalUsers .list-group-item.active {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+  z-index: 1;
+}
+
+#app .list-group-item.active .list-row-main,
+#app .list-group-item.active .list-group-item-action {
+  background-color: transparent;
+  color: inherit;
+}
+
+#app .list-group-item.active .text-muted {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+#app .list-group-item.active .list-item-icon-dim::before,
+#app .list-group-item.active .list-item-icon-cube::before {
+  opacity: 0.95;
+}
+
+/* Survol ligne non sélectionnée : léger gris (pas blanc pur) */
+#app .list-group-item:not(.active):hover,
+#modalUsers .list-group-item:not(.active):hover {
+  background-color: var(--bs-tertiary-bg);
+}

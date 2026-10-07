@@ -1,0 +1,22 @@
+#
+# Log rotation for Palo MOLAP server
+#
+# Install this file as /etc/logrotate.d/palo on Debian-based systems.
+#
+
+/var/log/palo/*.log {
+    weekly
+    rotate 12
+    missingok
+    notifempty
+    compress
+    delaycompress
+    create 0640 palo palo
+    sharedscripts
+    postrotate
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl reload palo.service >/dev/null 2>&1 || true
+        fi
+    endscript
+}
+

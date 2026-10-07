@@ -123,7 +123,7 @@ void CubeAnalyzerJob::compute()
 	if (numResult) {
 		vector<User::RoleDbCubeRight> vRights;
 		PCubeArea calcArea = checkRights(vRights, false, cubeArea, 0, cube, database, user, true, noPermission, isNoPermission, this->dims);
-		plan = cube->createPlan(calcArea, CubeArea::ALL, RulesType(DIRECT_RULES || NOCACHE), true, UNLIMITED_SORTED_PLAN);
+		plan = cube->createPlan(calcArea, CubeArea::ALL, RulesType(DIRECT_RULES | NOCACHE), true, UNLIMITED_SORTED_PLAN);
 	}
 
 	CubeAnalyzerDocumentation sbd(database, cube, plan, message1);

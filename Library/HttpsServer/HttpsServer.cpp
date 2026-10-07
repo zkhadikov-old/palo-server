@@ -30,6 +30,7 @@
 #include "HttpsServer/HttpsServer.h"
 
 #include <openssl/err.h>
+#include <openssl/evp.h>
 
 #include "Exceptions/CommunicationException.h"
 #include "HttpsServer/HttpsServerTask.h"
@@ -74,16 +75,21 @@ static SSL_CTX * initializeCTX(const string& rootfile, const string& keyfile, co
 {
 	static bool initialized = false;
 
-	// global system initialization
 	if (!initialized) {
-		SSL_library_init();
-		SSL_load_error_strings();
-
+		OPENSSL_init_ssl(
+			OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
+			NULL);
 		initialized = true;
 	}
 
-	// Create our context
-	SSL_CTX* sslctx = SSL_CTX_new(TLSv1_2_method());
+	// Create our context and enforce TLS 1.2+ on modern OpenSSL.
+	SSL_CTX* sslctx = SSL_CTX_new(TLS_method());
+	if (sslctx == 0) {
+		Logger::error << "cannot create SSL context" << endl;
+		Logger::error << lastSSLError() << endl;
+		return 0;
+	}
+	SSL_CTX_set_min_proto_version(sslctx, TLS1_2_VERSION);
 
 	// Load our keys and certificates
 	if (!SSL_CTX_use_certificate_chain_file(sslctx, keyfile.c_str())) {
@@ -108,10 +114,6 @@ static SSL_CTX * initializeCTX(const string& rootfile, const string& keyfile, co
 		return 0;
 	}
 
-#if (OPENSSL_VERSION_NUMBER < 0x00905100L)
-	SSL_CTX_set_verify_depth(sslctx, 1);
-#endif
-
 	return sslctx;
 }
 
@@ -130,15 +132,20 @@ static bool loadDHParameters(SSL_CTX* sslctx, const string& file)
 		return false;
 	}
 
-	DH * ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
+	EVP_PKEY* pkey = PEM_read_bio_Parameters(bio, NULL);
 	BIO_free(bio);
-
-	if (SSL_CTX_set_tmp_dh(sslctx, ret) < 0) {
-		Logger::error << "cannot set diffie-hellman parameters" << endl;
+	if (pkey == NULL) {
+		Logger::error << "cannot read DH parameters from '" << file << "'" << endl;
 		Logger::error << lastSSLError() << endl;
 		return false;
 	}
-
+	// SSL_CTX takes ownership of pkey on success.
+	if (SSL_CTX_set0_tmp_dh_pkey(sslctx, pkey) <= 0) {
+		Logger::error << "cannot set diffie-hellman parameters" << endl;
+		Logger::error << lastSSLError() << endl;
+		EVP_PKEY_free(pkey);
+		return false;
+	}
 	return true;
 }
 

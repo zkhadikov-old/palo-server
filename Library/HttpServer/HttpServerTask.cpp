@@ -36,6 +36,7 @@
 #include "HttpServer/HttpResponse.h"
 #include "HttpServer/HttpServer.h"
 #include "HttpServer/HttpJobRequest.h"
+#include "HttpServer/DirectHttpResponse.h"
 #include "PaloHttpServer/PaloSSORequestHandler.h"
 #include "Logger/Logger.h"
 #include "Dispatcher/Job.h"
@@ -309,6 +310,15 @@ bool HttpServerTask::processRead()
 						handleRequest = true;
 					}
 					break;
+
+				case HttpRequest::HTTP_REQUEST_OPTIONS: {
+					// CORS preflight: reply immediately (no handler dispatch).
+					// Headers are added globally in HttpResponse::getHeader() when cross-origin is configured.
+					httpRequestPending = true;
+					httpJobRequest = new DirectHttpResponse(httpRequest->getRequestPath(), new HttpResponse(HttpResponse::NO_RESPONSE));
+					handleDone();
+					return true;
+				}
 
 				default:
 					Logger::warning << "got corrupted HTTP request" << endl;

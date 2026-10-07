@@ -27,13 +27,28 @@
 #include <WinSock2.h>
 #endif
 
-#include <openssl/ssl.h>
+#include <mutex>
+
 #include <openssl/err.h>
+#include <openssl/ssl.h>
 
 #include "NetInitialisation.h"
 #include "../Exceptions/ErrorException.h"
 
 namespace palo {
+
+namespace {
+
+std::mutex g_sslClientInitMutex;
+
+void initOpenSslStrings()
+{
+	OPENSSL_init_ssl(
+		OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
+		NULL);
+}
+
+} // namespace
 
 NetInitialisation& NetInitialisation::instance()
 {
@@ -45,44 +60,55 @@ NetInitialisation::NetInitialisation()
 {
 #if defined(WIN32) || defined(WIN64)
 	WSADATA wsaData;
-	int wsaret = WSAStartup( 0x101, &wsaData );
+	WSAStartup(0x101, &wsaData);
 #endif
 	ctx = NULL;
 }
 
 void NetInitialisation::initSSL(std::string trustFile)
 {
-// TODOMD SSL
-/*	if (ctx == NULL) {
-		SSL_library_init();
-		SSL_load_error_strings();
-
-		ctx = SSL_CTX_new(SSLv23_client_method());
+	std::lock_guard<std::mutex> lock(g_sslClientInitMutex);
+	if (ctx != NULL) {
+		return;
 	}
 
-	if ((ctx != NULL) && !trustFile.empty() && !SSL_CTX_load_verify_locations((SSL_CTX *)ctx, trustFile.c_str(), NULL)) {
-		throw ErrorException(ErrorException::ERROR_INTERNAL, "bad certificate file");
-	}*/
+	initOpenSslStrings();
+
+	SSL_CTX* sslctx = SSL_CTX_new(TLS_client_method());
+	if (sslctx == NULL) {
+		throw ErrorException(ErrorException::ERROR_INTERNAL, "cannot create TLS client context");
+	}
+
+	SSL_CTX_set_min_proto_version(sslctx, TLS1_2_VERSION);
+	SSL_CTX_set_verify(sslctx, SSL_VERIFY_PEER, NULL);
+
+	if (!trustFile.empty()) {
+		if (!SSL_CTX_load_verify_locations(sslctx, trustFile.c_str(), NULL)) {
+			SSL_CTX_free(sslctx);
+			throw ErrorException(ErrorException::ERROR_INTERNAL, "bad certificate trust file");
+		}
+	} else if (!SSL_CTX_set_default_verify_paths(sslctx)) {
+		SSL_CTX_free(sslctx);
+		throw ErrorException(ErrorException::ERROR_INTERNAL, "cannot load default CA paths");
+	}
+
+	ctx = sslctx;
 }
 
-void * NetInitialisation::getSslContext()
+void* NetInitialisation::getSslContext()
 {
-	//check if openSSL is initialised
 	if (ctx == NULL) {
-		throw ErrorException(ErrorException::ERROR_INTERNAL, "openssl not initialized");
+		initSSL(std::string());
 	}
 	return ctx;
 }
-;
 
 NetInitialisation::~NetInitialisation()
 {
-	//TODOMD SSL
-	/*
 	if (ctx != NULL) {
-		SSL_CTX_free((SSL_CTX *)ctx);
-		ERR_free_strings();
-	}*/
+		SSL_CTX_free((SSL_CTX*)ctx);
+		ctx = NULL;
+	}
 
 #if defined(WIN32) || defined(WIN64)
 	WSACleanup();

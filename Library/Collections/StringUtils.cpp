@@ -189,7 +189,9 @@ std::string UTF8Comparer::doubleToString(double d, int32_t padding, int32_t deci
 double UTF8Comparer::stringToDouble(const string& str, bool uselocale)
 {
 	if (str.empty()) {
-		throw ParameterException(ErrorException::ERROR_CONVERSION_FAILED, "error converting a string to a number, string is empty", "str", str);
+		std::stringstream msg;
+		msg << "error converting a string to a number, string is empty: '" << str << "'";
+		throw ParameterException(ErrorException::ERROR_CONVERSION_FAILED, msg.str(), "str", str);
 	}
 	UTF8ComparerInternal *u8 = check();
 	UErrorCode er = U_ZERO_ERROR;
@@ -198,7 +200,9 @@ double UTF8Comparer::stringToDouble(const string& str, bool uselocale)
 	U_NAMESPACE_QUALIFIER ParsePosition p;
 	f->parse(U_NAMESPACE_QUALIFIER UnicodeString::fromUTF8(str.c_str()), form, p);
 	if ((size_t)p.getIndex() != str.size()) {
-		throw ParameterException(ErrorException::ERROR_CONVERSION_FAILED, "error converting a string to a number, string has illegal characters", "str", str);
+		std::stringstream msg;
+		msg << "error converting a string to a number, string has illegal characters: '" << str << "'";
+		throw ParameterException(ErrorException::ERROR_CONVERSION_FAILED, msg.str(), "str", str);
 	}
 	double d = form.getDouble(er);
 	if (U_FAILURE(er)) {

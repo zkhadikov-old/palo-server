@@ -46,13 +46,19 @@ class Dimension;
 
 class Parents {
 public:
-	class const_iterator : public std::iterator<random_access_iterator_tag, IdentifierType, ptrdiff_t, IdentifierType *, IdentifierType &> {
+	class const_iterator {
 	private:
 		const_iterator(const Parents *parents, uint32_t index) :
 			parents(parents), index(index)
 		{
 		}
 	public:
+		typedef random_access_iterator_tag iterator_category;
+		typedef IdentifierType value_type;
+		typedef ptrdiff_t difference_type;
+		typedef IdentifierType *pointer;
+		typedef IdentifierType &reference;
+
 		const_iterator(const const_iterator &it) : parents(it.parents), index(it.index)
 		{
 		}

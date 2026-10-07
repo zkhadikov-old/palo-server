@@ -52,7 +52,7 @@
 ## directory of online documentation 
 # (default directory is "Api")
 #
-# template-directory Binary/Api
+template-directory /var/lib/palo/Api
 #
 
 ## load all databases on server start into memory which are defined in the
@@ -103,6 +103,12 @@
 #
 # no-csv-save
 
+##
+# Force use_rules=1 by default for /cell/copy requests (like/predict/copy).
+# If set, rule-based source values are used even when use_rules is omitted.
+#
+# copy-use-rules-default
+
 ## default value for database access right  
 # Possible values: N, R, W, D (default D).
 #
@@ -138,9 +144,13 @@ http		"" 7777
 # http		localhost 7779
 #
 
-## cross-origin
-# to enable http requests from any origin  
-# cross-origin *
+## cross-origin (en-têtes CORS pour les clients JS / fetch depuis un autre hôte:port)
+# Par défaut : toute origine (interface admin sur un autre port, outils locaux).
+# En exposition réseau / Internet, restreindre ex. : cross-origin "https://mon-ui.exemple"
+cross-origin *
+#
+# Une seule origine (doit correspondre exactement à l’URL du navigateur, ex. localhost ≠ 127.0.0.1) :
+# cross-origin "http://localhost:8080"
 
 ### ############################################################################
 ### Logging
@@ -153,8 +163,8 @@ http		"" 7777
 # log to stderr
 # log + 
 #
-# log to a file
-# log /var/log/palo.log
+# log to a file (recommended for Debian-like systems)
+# log /var/log/palo/palo.log
 #
 
 ## Log-level
@@ -276,8 +286,10 @@ enable-drillthrough
 # admin command must be followed by a https command containing the HTTPS port to
 # use.
 #
-https 7778
-
+# NOTE: disabled by default because it requires valid certificates and a
+# proper 'encryption' setting. Uncomment and configure certificates before use.
+# https 7778
+ 
 ##
 # The following certificates are need: a root certificate and a private 
 # certificate signed be root authority. In addition a file with the

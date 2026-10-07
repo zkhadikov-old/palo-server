@@ -253,18 +253,19 @@ bool ZipUtils::addToZip(zipFile zf, string fileName)
 		do {
 			err = ZIP_OK;
 			size_read = (int)fread(buf, 1, size_buf, fin);
-			if (size_read < size_buf)
+			if (size_read < size_buf) {
 				if (feof(fin) == 0) {
 					Logger::error << "error in reading " << filenameinzip << endl;
 					err = ZIP_ERRNO;
 				}
+			}
 
-				if (size_read > 0) {
-					err = zipWriteInFileInZip(zf,buf,size_read);
-					if (err < 0) {
-						Logger::error << "error in writing in zipfile " << filenameinzip << endl;
-					}
+			if (size_read > 0) {
+				err = zipWriteInFileInZip(zf,buf,size_read);
+				if (err < 0) {
+					Logger::error << "error in writing in zipfile " << filenameinzip << endl;
 				}
+			}
 		} while ((err == ZIP_OK) && (size_read > 0));
 
 		if (fin) {

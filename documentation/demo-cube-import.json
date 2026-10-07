@@ -1,0 +1,130 @@
+{
+  "paloexport_version": 7,
+  "generator": "palo-server-demo",
+  "server": "127.0.0.1:7777",
+  "database": {
+    "name": "import_demo"
+  },
+  "cube": {
+    "name": "demo",
+    "number_dimensions": "3",
+    "dimensions_in_order": ["Année", "Mesures", "Villes"],
+    "type": "0",
+    "status": "1"
+  },
+  "dimensions": [
+    {
+      "name": "Année",
+      "type": "0",
+      "elements": [
+        {
+          "name": "2023",
+          "position": "0",
+          "level": "0",
+          "indent": "0",
+          "depth": "0",
+          "type": "1",
+          "number_parents": "0",
+          "parents": [],
+          "number_children": "0",
+          "children": [],
+          "weights": ""
+        },
+        {
+          "name": "2024",
+          "position": "1",
+          "level": "0",
+          "indent": "0",
+          "depth": "0",
+          "type": "1",
+          "number_parents": "0",
+          "parents": [],
+          "number_children": "0",
+          "children": [],
+          "weights": ""
+        }
+      ]
+    },
+    {
+      "name": "Mesures",
+      "type": "0",
+      "elements": [
+        {
+          "name": "Montant",
+          "position": "0",
+          "level": "0",
+          "indent": "0",
+          "depth": "0",
+          "type": "1",
+          "number_parents": "0",
+          "parents": [],
+          "number_children": "0",
+          "children": [],
+          "weights": ""
+        },
+        {
+          "name": "Quantité",
+          "position": "1",
+          "level": "0",
+          "indent": "0",
+          "depth": "0",
+          "type": "1",
+          "number_parents": "0",
+          "parents": [],
+          "number_children": "0",
+          "children": [],
+          "weights": ""
+        }
+      ]
+    },
+    {
+      "name": "Villes",
+      "type": "0",
+      "elements": [
+        {
+          "name": "Paris",
+          "position": "0",
+          "level": "0",
+          "indent": "0",
+          "depth": "0",
+          "type": "1",
+          "number_parents": "0",
+          "parents": [],
+          "number_children": "0",
+          "children": [],
+          "weights": ""
+        },
+        {
+          "name": "Lyon",
+          "position": "1",
+          "level": "0",
+          "indent": "0",
+          "depth": "0",
+          "type": "1",
+          "number_parents": "0",
+          "parents": [],
+          "number_children": "0",
+          "children": [],
+          "weights": ""
+        }
+      ]
+    }
+  ],
+  "rules": [],
+  "cell_data": {
+    "demo": [
+      {
+        "path": ["2024", "Montant", "Paris"],
+        "type": "1",
+        "exists": true,
+        "value": "1000"
+      },
+      {
+        "path": ["2024", "Quantité", "Lyon"],
+        "type": "1",
+        "exists": true,
+        "value": "42"
+      }
+    ]
+  }
+}
